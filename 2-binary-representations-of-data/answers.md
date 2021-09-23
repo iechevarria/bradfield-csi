@@ -52,21 +52,19 @@ f 1111
 
 Sum is 0b100001100 with 9 bits. Sum is 0b00001100 with 8 bits and overflow.
 
-# TODO
-
 ## 2.3
 
 ```
-127 ->
--128 ->
--1 ->
-1 -> 
--14 ->
+127 -> 01111111
+-128 -> 10000000
+-1 -> 11111111
+1 -> 00000001
+-14 -> 11110010
 ```
 
 ```
-10000011 ->
-11000100 ->
+10000011 -> -125
+11000100 -> -60
 ```
 
 ## 2.4
@@ -75,10 +73,17 @@ Sum is 0b100001100 with 9 bits. Sum is 0b00001100 with 8 bits and overflow.
 01111111
 10000000+
 ----------------
-
+11111111
 ```
 
+- The answer is -1 which is correct. This does match my expectations.
+- We can negate a number in two's complement by flipping all the bits and adding one. We can compute subtraction by adding the negation of the number to subtract.
+- Most significant bit is -128 in 8-bit two's complement. Most significant bit is -2^31 in 32-bit two's complement.
+
+
 ## 2.5
+
+Can detect overflow by checking if the summands have the same most significant bit if it then differs from the sum's most significant bit.
 
 ## 3.1
 
