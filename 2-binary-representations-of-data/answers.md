@@ -83,9 +83,13 @@ Sum is 0b100001100 with 9 bits. Sum is 0b00001100 with 8 bits and overflow.
 
 ## 2.5
 
-Can detect overflow by checking if the summands have the same most significant bit if it then differs from the sum's most significant bit.
+Can detect overflow by checking that only either carry out or carry in occurs, but not simultaneously
 
 ## 3.1
+
+This is big-endian
+
+# TODO
 
 ## 3.2
 
@@ -97,7 +101,28 @@ Can detect overflow by checking if the summands have the same most significant b
 
 ## 5.1
 
+Was getting so confused with this one. First: emoji on apple keyboard is not the same as the emoji on the site. Second, forgot to do echo -n, so was getting extra bytes. Finally did it right: 
+```
+$ echo -n ☃ > snowman.txt
+$ xxd snowman.txt
+```
+Got 3 bytes.
+
+Expect to see `11100010 10011000 10000011`. Verified! Nice!!
+
 ## 5.2
+
+`01101000 01100101 01101101 01101101 01101111` -> "hello" in ASCII.
+
+Looks like we're dealing with UTF-8.
+
+Leading 0 tripped me up here:
+```
+11110000 10011111 10011000 10000000 ->
+0 0001 1111 0110 0000 0000 ->
+0x1F600 ->
+😀
+```
 
 ## 5.3
 
