@@ -89,15 +89,30 @@ Can detect overflow by checking that only either carry out or carry in occurs, b
 
 This is big-endian
 
-# TODO
-
 ## 3.2
 
 ## 3.3
 
 ## 4.1
 
+```
+01000010001010100000000000000000
+
+sign - 0
+exponent - 10000100
+mantissa - 01010100000000000000000
+
+(1 + 1/4 + 1/16 + 1/64) * 2^5
+= 42.5
+```
+
+Floating point precision decreases as the size increases.
+
 ## 4.2
+
+// TODO: return to this when I'm better at bit shifting
+
+Seems like what's happening is the bit magic is ignoring the mantissa and just manipulating the exponent directly. But I don't know exactly how.
 
 ## 5.1
 
