@@ -93,6 +93,12 @@ This is big-endian
 
 ## 3.3
 
+- They are Windows 3.1x, 95, NT, etc bitmaps (BM).
+- image1 is 24 x 48. image2 is 32 x 64.
+- 24 bits per pixel (3 bytes).
+- Image data starts at 138.
+- image1 is a white rectangle. image2 is a red rectangle.
+
 ## 4.1
 
 ```
