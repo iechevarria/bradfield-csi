@@ -1,6 +1,8 @@
 section .text
 global binary_convert
 binary_convert:
+	xor rax, rax
+loop:
 	cmp byte [rdi], 0
 	je exit
 	shl rax, 1
@@ -9,6 +11,6 @@ binary_convert:
 	add rax, 1
 next:
 	inc rdi
-	jmp binary_convert
+	jmp loop
 exit:
 	ret
