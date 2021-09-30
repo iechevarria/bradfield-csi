@@ -1,5 +1,5 @@
 *.o
-vendor
+vendor/*
 Makefile
 tests
 tests.c
