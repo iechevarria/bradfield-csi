@@ -6,6 +6,7 @@
 
 // switched page_size from being the size itself to just he shift size
 // no performance improvement though :(
+// nevermind! big improvement when -O3
 uint64_t pagecount(uint64_t memory_size, uint64_t page_size) {
   return memory_size >> page_size;
 }
@@ -33,9 +34,9 @@ int main (int argc, char** argv) {
     memory_size = msizes[i % 3];
     page_size = psizes[i % 3];
 
-    // inlining gives the biggest improvement! wow huge ~1.7ns -> 0.25ns
-    // wait is that too low to be plausible? hmmm
-    ignore += (memory_size >> page_size) + memory_size + page_size;
+    // inlining gives the biggest improvement when compiler isn't optimizing
+    // (memory_size >> page_size) + memory_size + page_size;
+    ignore += pagecount(memory_size, page_size) + memory_size + page_size; 
   }
   test_end = clock();
 
