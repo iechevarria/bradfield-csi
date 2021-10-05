@@ -1,5 +1,3 @@
-# 1. pagecount
-
 - The function is substantially different at higher optimization levels. At higher optimization levels, the function is inlined, while at lower optimization levels, it's an actual function call
 - Integer division appears even at higher optimization levels and is slow.
 - We can use bit shifting insted of integer division because page size is always a power of 2.

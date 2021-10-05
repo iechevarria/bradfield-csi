@@ -1,5 +1,3 @@
 *.o
-vendor/*
-Makefile
 tests
-tests.c
+

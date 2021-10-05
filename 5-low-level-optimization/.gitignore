@@ -1,8 +1,3 @@
 *.out
 *.o
-vec/vendor/*
 vec/tests
-vec/tests.c
-vec/vec.c
-vec/vec.h
-Makefile

@@ -1,8 +1,3 @@
 *.o
 *.out
-vendor/*
-hello_linux.asm
-hello_mac.asm
-Makefile
 tests
-tests.c
