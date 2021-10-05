@@ -1,0 +1,8 @@
+# 1. pagecount
+
+- The function is substantially different at higher optimization levels. At higher optimization levels, the function is inlined, while at lower optimization levels, it's an actual function call
+- Integer division appears even at higher optimization levels and is slow.
+- We can use bit shifting insted of integer division because page size is always a power of 2.
+- I expect to see at least a 3x speedup by switching from integer division to bit shifting based on the table in CS:APP 5.7 (page 523).
+- I saw a 4-5x speedup.
+- The compiler can't make this optimization because it doesn't know that both the dividend and divisor are powers of two and that the divisor always divides cleanly.
