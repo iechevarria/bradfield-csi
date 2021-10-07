@@ -1,1 +1,1 @@
-gcc -O3 benchmark.c matrix-multiply.c -o a.out && ./a.out 500
+gcc -O3 -Wall matrix-multiply.c benchmark.c -o a.out && ./a.out 512

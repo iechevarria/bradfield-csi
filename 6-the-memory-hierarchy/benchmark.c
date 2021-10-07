@@ -8,23 +8,6 @@
 #include "matrix-multiply.h"
 
 
-// Allocate space for an m x n matrix. Caller frees.
-double **matrix_alloc(int m, int n) {
-  double **matrix = malloc(m * sizeof(double));
-
-  for (int i = 0; i < m; i++)
-    matrix[i] = calloc(n, sizeof(double));
-
-  return matrix;
-}
-
-// Free the entirety of an m row matrix
-void matrix_free(double **matrix, int m) {
-  for (int i = 0; i < m; i++)
-    free(matrix[i]);
-  free(matrix);
-}
-
 // Fill an m x n matrix with random values
 void matrix_fill_random(double **matrix, int m, int n) {
   for (int i = 0; i < m; i++)
