@@ -26,8 +26,9 @@ func main () {
 			args := strings.Fields(line)
 			cmd := exec.Command(args[0], args[1:]...)
 
-			// hook up command stdout to the shell's and run
+			// hook up command stdin/stdout to the shell's and run
 			cmd.Stdout = os.Stdout
+			cmd.Stdin = os.Stdin
 			err := cmd.Run()
 			if err != nil {
 				fmt.Println("🐒💩 " + args[0] + ": command not found")
