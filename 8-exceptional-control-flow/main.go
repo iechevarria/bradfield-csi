@@ -9,6 +9,30 @@ import (
 	"strings"
 )
 
+func run (args []string) {
+	if len(args) == 0 {
+		return
+	}
+
+	fn := args[0];
+
+	switch fn {
+	case "exit":
+		// TODO: raise some kind of exception here
+		fmt.Println("You suck!")
+	default:
+		// try to fork + exec
+		cmd := exec.Command(args[0], args[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stdin = os.Stdin
+		cmd.Stderr = os.Stderr		
+		err := cmd.Run()
+		if err != nil {
+			fmt.Println("🐒💩 " + args[0] + ": command not found")
+		}
+	}
+}
+
 func main () {
 	var sb strings.Builder
 	in := bufio.NewReader(os.Stdin)
@@ -21,25 +45,12 @@ func main () {
 			break
 		} else if r == '\n' {
 			line := sb.String()
-
-			// try to fork + exec
 			args := strings.Fields(line)
-			cmd := exec.Command(args[0], args[1:]...)
-
-			// hook up command stdin/stdout to the shell's and run
-			cmd.Stdout = os.Stdout
-			cmd.Stdin = os.Stdin
-			err := cmd.Run()
-			if err != nil {
-				fmt.Println("🐒💩 " + args[0] + ": command not found")
-			}
-
-			// fmt.Println(line)
+			run(args)
 
 			// reset terminal
 			fmt.Print("🐵 ")
 			sb.Reset()
-
 		} else {
 			sb.WriteRune(r)
 		}	
