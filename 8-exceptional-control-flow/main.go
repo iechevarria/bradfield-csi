@@ -7,30 +7,35 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
-func run (args []string) {
+func run (args []string) error {
 	if len(args) == 0 {
-		return
+		return nil
 	}
 
 	fn := args[0];
 
 	switch fn {
 	case "exit":
-		// TODO: raise some kind of exception here
-		fmt.Println("You suck!")
+		// pretty weird to use io.EOF as the err here
+		return io.EOF
+	case "cd":
+		if len(args) < 2 {
+			return nil
+		}
+		return syscall.Chdir(args[1])
 	default:
-		// try to fork + exec
+		// errors are ugly here. ideally process them
 		cmd := exec.Command(args[0], args[1:]...)
 		cmd.Stdout = os.Stdout
 		cmd.Stdin = os.Stdin
-		cmd.Stderr = os.Stderr		
-		err := cmd.Run()
-		if err != nil {
-			fmt.Println("🐒💩 " + args[0] + ": command not found")
-		}
+		cmd.Stderr = os.Stderr	
+		return cmd.Run()
 	}
+
+	return nil
 }
 
 func main () {
@@ -41,12 +46,18 @@ func main () {
 	for {
 		r, _, err := in.ReadRune()
 		if err == io.EOF {
-			fmt.Println("\n🙉🙈🙊")
 			break
 		} else if r == '\n' {
 			line := sb.String()
 			args := strings.Fields(line)
-			run(args)
+			err := run(args)
+			if err == io.EOF {
+				break	
+			}
+
+			if err != nil {
+				fmt.Println("🐒💩 " + args[0] + ": " + err.Error())
+			}
 
 			// reset terminal
 			fmt.Print("🐵 ")
@@ -55,4 +66,6 @@ func main () {
 			sb.WriteRune(r)
 		}	
 	}
+
+	fmt.Println("\n🙉🙈🙊")
 }
