@@ -80,16 +80,54 @@ func check_pcap_packet_header(pcap PcapPacketHeader) {
 	}
 }
 
+// total size 14 bytes
 type EthernetHeader struct {
-	MACDestination [6]byte
-	MACSource      [6]byte
-	EtherType      uint16 // 0x800 - IPv4
+	MacDest   [6]byte
+	MacSource [6]byte
+	EtherType uint16 // 0x800 - IPv4
 }
 
 func check_ethernet_header(ethernet EthernetHeader) {
-    if ethernet.EtherType != 0x800 {
-        panic(fmt.Sprintln("Wrong EtherType:", ethernet.EtherType))
-    }
+	if ethernet.EtherType != 0x800 {
+		panic(fmt.Sprintln("Wrong EtherType:", ethernet.EtherType))
+	}
+}
+
+// total size 20 bytes
+type IpHeader struct {
+	VersionIHL     uint8 // IHL should be 5, so no options
+	TOS            uint8
+	TotalLength    uint16
+	Identification uint16
+	FlagsFragment  uint16
+	TTL            uint8
+	Protocol       uint8
+	HeaderChecksum uint16
+	SourceAddress  uint32
+	DestAddress    uint32
+}
+
+func check_ip_header(ip IpHeader) {
+	ihl := (ip.VersionIHL << 4) >> 4
+	if ihl != 5 {
+		panic(fmt.Sprintln("Wrong IHL:", ihl))
+	}
+	// 6 is TCP
+	if ip.Protocol != 6 {
+		panic(fmt.Sprintln("Wrong Protocol:", ip.Protocol))
+	}
+}
+
+// total size 16 bytes
+type TcpHeader struct {
+	SourcePort     uint16
+	DestPort       uint16
+	SequenceNumber uint32
+	AckNumber      uint32
+	BigMess        uint16
+	WindowSize     uint16
+	Checksum       uint16
+	UrgentPointer  uint16
 }
 
 func check(e error) {
@@ -110,12 +148,14 @@ func main() {
 
 	pcap_packet := PcapPacketHeader{}
 	ethernet := EthernetHeader{}
+	ip := IpHeader{}
+	tcp := TcpHeader{}
 	var n_packets int
 	for {
 		_, err = f.Seek(int64(pcap_packet.Length), 1)
 		check(err)
 
-        // pcap packet
+		// pcap packet
 		err = binary.Read(f, binary.LittleEndian, &pcap_packet)
 		if err != nil {
 			if err == io.EOF {
@@ -125,17 +165,28 @@ func main() {
 		}
 		check_pcap_packet_header(pcap_packet)
 
-        // ethernet
+		// ethernet
 		err = binary.Read(f, binary.BigEndian, &ethernet)
+		check(err)
 		check_ethernet_header(ethernet)
-        fmt.Println(ethernet)
-        
-        n_packets += 1
-		fmt.Println(n_packets, pcap_packet)
+		// fmt.Println(ethernet)
 
-        // go back to beginning of pcap packet to make math at the top work. hacky.
-        _, err = f.Seek(-14, 1)
-        check(err)
+		// IP
+		err = binary.Read(f, binary.BigEndian, &ip)
+		check(err)
+		check_ip_header(ip)
+
+		// TCP
+		err = binary.Read(f, binary.BigEndian, &tcp)
+		check(err)
+		fmt.Println(tcp)
+
+		n_packets += 1
+		// fmt.Println(n_packets, pcap_packet)
+
+		// go back to beginning of pcap packet to make math at the top work. hacky.
+		_, err = f.Seek(-14-20-20, 1)
+		check(err)
 	}
 
 	if n_packets != 99 {
