@@ -118,7 +118,7 @@ func check_ip_header(ip IpHeader) {
 	}
 }
 
-// total size 16 bytes
+// total size 20 bytes
 type TcpHeader struct {
 	SourcePort     uint16
 	DestPort       uint16
@@ -182,7 +182,6 @@ func main() {
 		fmt.Println(tcp)
 
 		n_packets += 1
-		// fmt.Println(n_packets, pcap_packet)
 
 		// go back to beginning of pcap packet to make math at the top work. hacky.
 		_, err = f.Seek(-14-20-20, 1)
