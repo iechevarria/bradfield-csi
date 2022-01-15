@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"strings"
 )
 
 func check(e error) {
@@ -43,25 +44,40 @@ type DnsHeader struct {
 func main() {
 	//    4    d    o    c    s    6    g    o    o    g   l     e    3    c   o    m   end
 	// 0x04 0x64 0x6f 0x63 0x73 0x06 0x67 0x6f 0x6f 0x67 0x6c 0x65 0x03 0x63 0x6f 0x6d 0x00
-	request_qname := [...]byte{0x04, 0x64, 0x6f, 0x63, 0x73, 0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d, 0x00}
+	// request_qname := [...]byte{0x04, 0x64, 0x6f, 0x63, 0x73, 0x06, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x03, 0x63, 0x6f, 0x6d, 0x00}
 
+	// Making url const feels stupid
+	const url = "docs.google.com"
+
+	var qname_slice []byte
+	for _, a := range strings.Split(url, ".") {
+		qname_slice = append(qname_slice, byte(len(a)))
+		qname_slice = append(qname_slice, []byte(a)...)
+	}
+	qname_slice = append(qname_slice, 0)
+
+	// There has to be a better way
+	var request_qname [len(url) + 2]byte
+	copy(request_qname[:], qname_slice)
+
+	// Seems like a struct is not actually a good way to do this
 	dns_query := struct {
 		Header DnsHeader
 		QName  [len(request_qname)]byte
 		QType  uint16
 		QClass uint16
 	}{
-		DnsHeader{
-			12345,  // id
-			0x0100, // flags
-			1,      // qd count
-			0,      // an count
-			0,      // ns count
-			0,      // ar count
+		Header: DnsHeader{
+			Id:      12345,
+			Flags:   0x0100,
+			QdCount: 1,
+			AnCount: 0,
+			NsCount: 0,
+			ArCount: 0,
 		},
-		request_qname, // qname
-		1,             // qtype
-		1,             // qclass
+		QName:  request_qname,
+		QType:  1,
+		QClass: 1,
 	}
 
 	// send request
@@ -101,5 +117,9 @@ func main() {
 	}
 
 	fmt.Println(response_question)
+	fmt.Println(response_reader)
+	for _, b := range response_reader {
+		fmt.Println(b)
+	}
 	conn.Close()
 }
