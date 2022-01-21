@@ -69,3 +69,50 @@ tcp slow start:
 window size: clamps how far congestion control can scale. it's about how much the recipient can handle
 
 backpressure: you shouldn't just give up or let overflow. you should be able to send back downstream to say "give me this much instead". backpressure lets you adapt to things increasing and decreasing. want some way to say more or less pls
+
+
+# 2021-01-17
+
+maybe 30 years was reasonable to do things other IP. but now this specific network layer protocol is what runs the show.
+
+bradfield: deep but not deep enough to set up your wifi printer
+
+origins:
+- myth about internet: was made for resilience against nuclear attack. helped to get funding routed that way
+- let's connect independent networks together. do whatever you want internally. with this money, connect to the other ones
+- ivan sutherland was in u of u. graphics researchers there too. teapot there
+- satellite link used to connect to hawaii and norway
+- email was a big reason. bulletin board. telnet. remote terminal operation. mostly about collaboration and resource sharing across institutions. email documents. level up from a fax. executables and so on. primarily universities
+
+how to do routing:
+- packet going to come into a router (edge router). router has many links out to like maybe 30 peers. google for example has 426 peers!
+- autonomous systems are discrete things that need to connect at the edges. ones at the edges connect to peer
+- important decision at edge: where to route to?
+- router is a dedicated physical device. not general purpose. prefix matching as fast as possible. MIPS machines were used as routers. now longest prefix match lookup accelerated with hardware
+
+a lot of stuff on the web about the internet is wrong now lol. like 20 years out of date
+
+flag day story (look up IP flag day):
+- NCP was prior routing protocol. like 200 machines on arpanet. wasn't super well designed. wasn't enough thought given to higher throughput. IP was replacement for NCP. everyone had to switch to IP. "in the morning, everyone has to go to IP." 
+- "would like someone to do abrupt changes. NCP -> IP, sweden road side change"
+
+some IPV4 stuff:
+`A 8 bit AS 24 bit subnet` 256 subnets, 16m size
+`B 16 bit AS 16 bit subnet` 65k subnets, 65k size
+`C 24 bit AS 8 bit subnet` 16m subnets, 256 size
+
+IPV6:
+- first 64 bits is subnet id. next 64 bits is for within the subnet
+- facebook hit 50% ipv6 traffic a little while ago
+
+we need hacks for ipv4:
+- ips are leased out to customers. router uses DHCP to get ip address. ISP can also tell you dns server to use. will tell you lease length also. i
+- no reason to expect fixed ipv6 address either tho. still dynamic
+
+NAT
+- need mechanism for knowing that some port maps to a private ip address and port
+- 2^16 max number of ports
+
+can't bind to localhost uhhhh. 0.0.0.0 can 
+cisco router does whatever 
+doing protocols. mostly about writing good software now.

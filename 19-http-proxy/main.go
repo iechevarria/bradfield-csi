@@ -17,26 +17,30 @@ func main() {
 	defer syscall.Close(sock)
 
 	sockAddr := &syscall.SockaddrInet4{
-		Port: 6969,
+		Port: 1991,
 		Addr: [4]byte{127, 0, 0, 1},
 	}
 	err = syscall.Bind(sock, sockAddr)
 	check(err)
 
-	err = syscall.Listen(sock, 1)
+	err = syscall.Listen(sock, 128)
 	check(err)
 
-	nfd, addr, err := syscall.Accept(sock)
-	check(err)
+	for {
+		client_fd, addr, err := syscall.Accept(sock)
+		check(err)
 
-	buf := make([]byte, 1024)
-	nfd, addr, err = syscall.Recvfrom(nfd, buf, 0)
-	fmt.Println(buf)
-	check(err)
+		fmt.Println(client_fd)
+		fmt.Println(addr)
+		fmt.Println(sock)
 
-	err = syscall.Sendto(sock, buf, 0, sockAddr)
-	check(err)
+		for {
+			buf := make([]byte, 1024)
+			_, _, err = syscall.Recvfrom(client_fd, buf, 0)
+			check(err)
 
-	fmt.Println(buf)
-	fmt.Println(addr)
+			err = syscall.Sendto(client_fd, buf, 0, sockAddr)
+			check(err)
+		}
+	}
 }
