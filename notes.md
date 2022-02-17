@@ -71,7 +71,7 @@ window size: clamps how far congestion control can scale. it's about how much th
 backpressure: you shouldn't just give up or let overflow. you should be able to send back downstream to say "give me this much instead". backpressure lets you adapt to things increasing and decreasing. want some way to say more or less pls
 
 
-# 2021-01-17
+# 2022-01-17
 
 maybe 30 years was reasonable to do things other IP. but now this specific network layer protocol is what runs the show.
 
@@ -116,3 +116,76 @@ NAT
 can't bind to localhost uhhhh. 0.0.0.0 can 
 cisco router does whatever 
 doing protocols. mostly about writing good software now.
+
+
+# 2022-01-24
+
+only a few weird tricks in network security
+security is a domain in itself as is network security
+could spend a whole career on one part of this and be well employed and do interesting work
+security is pretty competitive
+
+
+## problems vs 1 weird tricks
+
+problem: endpoint verification (how do i know you are who you say you are?)
+solution: certificates, signature, certificate authorities. certificates to prove you are who you say you are. certificate contains signature(s). cryptographic trick where you can only generate private key
+
+problem: integrity (did someone modify it?)
+solution: cryptographic hashes / MAC (message auth codes)
+
+problem: confidentiality
+solution: symmetric key encryption + small amount of asymmetric 
+
+problem: availability
+solution: idk
+
+problem: opsec
+solution: paranoia
+
+problem: privacy
+solution: VPN, TOR
+
+## misc
+
+all handshakes messages are verified with hashes
+
+mid-ish way through you know the rest of the data needs to be sent. maybe before final master key. would be nice to prevent where someone who's captured every MAC in a way that would be useful to them. cert is sent so early 
+
+ban printers because opsec risk
+
+## symmetric
+
+AES (symmetric) jumbles things up. quite fast. cpu architectures have support also.
+- what is it if you don't have starting key?
+- going to look at plaintext and guess what key was? hard bc key expansion makes every round highly entropic. all sub steps super easy.
+- lot of work to come up with the system
+- are expanded keys dependent on previous rounds at all? not dependent on previous round
+- not that hard to write out. it's a weekend project
+- TLS probably uses AES 192 or something
+
+## public key
+
+problem: how do you get the same key / do key exchange?
+solution: public key encryption
+
+diffi helman and RSA created around the same time. same solution to same problem
+recently found out before either of these groups, someone at MI6 figured it out first
+
+stuff you gotta get:
+- be able to get a bunch of big primes
+- test big primes pretty quick
+- generate N = p * q (both primes)
+- want to take a message x = E(m), m = D(x); x cyphertext, m message
+- given N, you cannot find p and q
+
+extremely computationally expensive. constantly taking stuff down to mod N. remaining very heavy. not feasible to share large message this way. symmetry key crypto needed bc this is so computationally intensive
+
+there's a nonce don't worry about it pal
+
+
+# 2022-01-27
+
+neat trick: idempotency key. include a key on each request
+endpoint idempotency nice
+want to do only the first one
