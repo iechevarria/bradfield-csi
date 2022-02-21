@@ -80,54 +80,54 @@ func next(t *testing.T, iterator Iterator, expected bool) {
 }
 
 
-// func TestIterator(t *testing.T) {
-// 	m := Memtable{}
+func TestIterator(t *testing.T) {
+	m := Memtable{}
 
-// 	put(t, &m, "potato", "chip")
-// 	put(t, &m, "tomato", "sauce")
-// 	put(t, &m, "banana", "split")
-// 	put(t, &m, "orange", "juice")
-// 	put(t, &m, "almond", "milk")
-// 	put(t, &m, "carrot", "cake")
-// 	put(t, &m, "garlic", "bread")
-// 	put(t, &m, "cherry", "pie")
+	put(t, &m, "potato", "chip")
+	put(t, &m, "tomato", "sauce")
+	put(t, &m, "banana", "split")
+	put(t, &m, "orange", "juice")
+	put(t, &m, "almond", "milk")
+	put(t, &m, "carrot", "cake")
+	put(t, &m, "garlic", "bread")
+	put(t, &m, "cherry", "pie")
 
-// 	fmt.Println(m)
-// 	iterator, _ := m.RangeScan([]byte("carrot"), []byte("potato"))
-// 	key(t, iterator, "carrot")
-// 	value(t, iterator, "cake")
+	fmt.Println(m)
+	iterator, _ := m.RangeScan([]byte("carrot"), []byte("potato"))
+	key(t, iterator, "carrot")
+	value(t, iterator, "cake")
 
-// 	next(t, iterator, true)
-// 	key(t, iterator, "cherry")
-// 	value(t, iterator, "pie")
+	next(t, iterator, true)
+	key(t, iterator, "cherry")
+	value(t, iterator, "pie")
 
-// 	next(t, iterator, true)
-// 	key(t, iterator, "garlic")
-// 	value(t, iterator, "bread")
+	next(t, iterator, true)
+	key(t, iterator, "garlic")
+	value(t, iterator, "bread")
 
-// 	next(t, iterator, true)
-// 	key(t, iterator, "orange")
-// 	value(t, iterator, "juice")
+	next(t, iterator, true)
+	key(t, iterator, "orange")
+	value(t, iterator, "juice")
 
-// 	next(t, iterator, false)
-// 	key(t, iterator, "")
-// 	value(t, iterator, "")
-// }
+	next(t, iterator, false)
+	key(t, iterator, "")
+	value(t, iterator, "")
+}
 
-// func TestIteratorEmpty(t *testing.T) {
-// 	m := Memtable{}
+func TestIteratorEmpty(t *testing.T) {
+	m := Memtable{}
 
-// 	iterator, _ := m.RangeScan([]byte("carrot"), []byte("potato"))
-// 	key(t, iterator, "")
-// 	value(t, iterator, "")
-// 	next(t, iterator, false)
-// }
+	iterator, _ := m.RangeScan([]byte("carrot"), []byte("potato"))
+	key(t, iterator, "")
+	value(t, iterator, "")
+	next(t, iterator, false)
+}
 
-// func TestIteratorKeysNotInTable(t *testing.T) {
-// 	m := Memtable{}
+func TestIteratorKeysNotInTable(t *testing.T) {
+	m := Memtable{}
 
-// 	iterator, _ := m.RangeScan([]byte("artichoke"), []byte(""))
-// 	key(t, iterator, "")
-// 	value(t, iterator, "")
-// 	next(t, iterator, false)
-// }
+	iterator, _ := m.RangeScan([]byte("artichoke"), []byte(""))
+	key(t, iterator, "")
+	value(t, iterator, "")
+	next(t, iterator, false)
+}

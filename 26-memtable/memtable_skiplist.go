@@ -65,7 +65,7 @@ func NewMemtable(maxLevel int) *Memtable {
 
 type Node struct {
 	Level   int
-	Flags   uint8 // tombstone stored here. tbd if anything else
+	Deleted bool
 	Key     string
 	Value   []byte
 	Forward []*Node
@@ -74,7 +74,7 @@ type Node struct {
 func NewNode(key string, value []byte, level int) *Node {
 	return &Node{
 		Level:   level,
-		Flags:   active,
+		Deleted: false,
 		Key:     key,
 		Value:   value,
 		Forward: make([]*Node, level+1),
@@ -109,13 +109,34 @@ func (m *Memtable) Get(key []byte) ([]byte, error) {
 		// is there a less gross way to do this?
 		for curNode.Forward[i] != nil && (*curNode.Forward[i]).Key <= string(key) {
 			curNode = *curNode.Forward[i]
-			if curNode.Key == string(key) && curNode.Flags != deleted {
+			if curNode.Key == string(key) && !curNode.Deleted {
 				return curNode.Value, nil
 			}
 		}
 	}
 
 	return nil, KeyNotFound(key)
+}
+
+func (m *Memtable) Has(key []byte) (bool, error) {
+	_, err := m.Get(key)
+	return err == nil, nil
+}
+
+func (m *Memtable) Delete(key []byte) error {
+	curNodeAddr := &m.Header
+	for i := m.Header.Level; i >= 0; i-- {
+		// is there a less gross way to do this?
+		for (*curNodeAddr).Forward[i] != nil && (*(*curNodeAddr).Forward[i]).Key <= string(key) {
+			curNodeAddr = curNodeAddr.Forward[i]
+			if (*curNodeAddr).Key == string(key) {
+				(*curNodeAddr).Deleted = true
+				return nil
+			}
+		}
+	}
+
+	return KeyNotFound(key)
 }
 
 func (m *Memtable) Put(key []byte, value []byte) error {
@@ -131,7 +152,7 @@ func (m *Memtable) Put(key []byte, value []byte) error {
 	// is there a less gross way to do this?
 	if (*curNodeAddr).Forward[0] != nil && (*(*curNodeAddr).Forward[0]).Key == string(key) {
 		(*(*curNodeAddr).Forward[0]).Value = value
-		(*(*curNodeAddr).Forward[0]).Flags = active
+		(*(*curNodeAddr).Forward[0]).Deleted = false
 	} else {
 		level := m.RandomLevel()
 		if level > m.Header.Level {
@@ -151,11 +172,77 @@ func (m *Memtable) Put(key []byte, value []byte) error {
 	return nil
 }
 
-// func printUpdate(update []*Node) {
-// 	fmt.Println("\n\n\n\n", update)
-// 	for _, u := range update {
-// 		if u != nil {
-// 			fmt.Println(*u)
-// 		}
-// 	}
-// }
+type RangeIterator struct {
+	Err     error
+	CurNode *Node
+	Limit   string
+}
+
+func NewRangeIterator(curNode *Node, limit []byte) *RangeIterator {
+	return &RangeIterator{
+		Err:     nil,
+		CurNode: curNode,
+		Limit:   string(limit),
+	}
+}
+
+func (m *Memtable) RangeScan(start, limit []byte) (Iterator, error) {
+	if m.Size == 0 {
+		return NewRangeIterator(nil, limit), nil
+	}
+
+	curNodeAddr := &m.Header
+	for i := m.Header.Level; i >= 0; i-- {
+		// is there a less gross way to do this?
+		for (*curNodeAddr).Forward[i] != nil && (*(*curNodeAddr).Forward[i]).Key < string(start) {
+			curNodeAddr = curNodeAddr.Forward[i]
+		}
+	}
+
+	curNodeAddr = curNodeAddr.Forward[0]
+	return NewRangeIterator(curNodeAddr, limit), nil
+}
+
+func (r *RangeIterator) Next() bool {
+	// terminated
+	if r.CurNode == nil {
+		return false
+	}
+
+	// continue until not on deleted node
+	for ok := true; ok; ok = (*r.CurNode).Deleted {
+		// at the end of the table
+		if (*r.CurNode).Forward[0] == nil {
+			r.CurNode = nil
+			return false
+		}
+		// at limit
+		if (*(*r.CurNode).Forward[0]).Key >= r.Limit {
+			r.CurNode = nil
+			return false
+		}
+
+		// otherwise go forward
+		r.CurNode = (*r.CurNode).Forward[0]
+	}
+
+	return true
+}
+
+func (r *RangeIterator) Error() error {
+	return r.Err
+}
+
+func (r *RangeIterator) Key() []byte {
+	if r.CurNode == nil {
+		return nil
+	}
+	return []byte((*r.CurNode).Key)
+}
+
+func (r *RangeIterator) Value() []byte {
+	if r.CurNode == nil {
+		return nil
+	}
+	return []byte((*r.CurNode).Value)
+}
